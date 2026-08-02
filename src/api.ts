@@ -248,3 +248,64 @@ export async function apiGetExpenses(groupId: string): Promise<ApiExpense[]> {
   const data = await res.json()
   return data.expenses
 }
+
+// ─── Expense create/delete ─────────────────────────────────────────────────
+
+export async function apiCreateExpense(
+  groupId: string,
+  body: {
+    description: string
+    amountCents: number
+    paidBy: string
+    splitType: string
+    splits: { userId: string; amountOwedCents: number; isPayer: boolean }[]
+  }
+): Promise<ApiExpense> {
+  const res = await apiFetch(`/groups/${groupId}/expenses`, {
+    method: "POST",
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) throw new Error(`Failed to create expense (${res.status})`)
+  return res.json()
+}
+
+export async function apiDeleteExpense(groupId: string, expenseId: string): Promise<void> {
+  const res = await apiFetch(`/groups/${groupId}/expenses/${expenseId}`, { method: "DELETE" })
+  if (!res.ok) throw new Error(`Failed to delete expense (${res.status})`)
+}
+
+// ─── Settlements ────────────────────────────────────────────────────────────
+
+export type ApiSettlement = {
+  settlementId: string
+  groupId: string
+  fromUserId: string
+  toUserId: string
+  amountCents: number
+  createdBy: string
+  createdAt: string
+}
+
+export async function apiGetSettlements(groupId: string): Promise<ApiSettlement[]> {
+  const res = await apiFetch(`/groups/${groupId}/settlements`)
+  if (!res.ok) throw new Error(`Failed to load settlements (${res.status})`)
+  const data = await res.json()
+  return data.settlements
+}
+
+export async function apiCreateSettlement(
+  groupId: string,
+  body: { fromUserId: string; toUserId: string; amountCents: number }
+): Promise<ApiSettlement> {
+  const res = await apiFetch(`/groups/${groupId}/settlements`, {
+    method: "POST",
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) throw new Error(`Failed to create settlement (${res.status})`)
+  return res.json()
+}
+
+export async function apiDeleteSettlement(groupId: string, settlementId: string): Promise<void> {
+  const res = await apiFetch(`/groups/${groupId}/settlements/${settlementId}`, { method: "DELETE" })
+  if (!res.ok) throw new Error(`Failed to delete settlement (${res.status})`)
+}
