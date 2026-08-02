@@ -2,7 +2,7 @@
 
 import type { ReactNode, ButtonHTMLAttributes, InputHTMLAttributes } from "react"
 
-const AVATAR_COLORS = ["#a78bfa", "#e879f9", "#38bdf8", "#34d399", "#fb923c", "#f472b6", "#facc15"]
+const AVATAR_COLORS = ["#13b6df", "#3de2a3", "#38bdf8", "#34d399", "#fb923c", "#169ae7", "#15fadb"]
 
 export function avatarColor(id: string) {
   let h = 0
