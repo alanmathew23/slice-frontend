@@ -4,20 +4,20 @@
 @import 'tailwindcss';
 
 @theme inline {
-  --color-background: #0d0d12;
-  --color-foreground: #f0eef8;
-  --color-card: #15141f;
-  --color-card-foreground: #f0eef8;
-  --color-primary: #a78bfa;
-  --color-primary-foreground: #0d0d12;
-  --color-secondary: #1e1c2e;
-  --color-secondary-foreground: #c4bfe8;
-  --color-muted: #1a1826;
-  --color-muted-foreground: #7c7a99;
-  --color-accent: #e879f9;
-  --color-accent-foreground: #0d0d12;
-  --color-border: rgba(167, 139, 250, 0.12);
-  --color-ring: #a78bfa;
+  --color-background: #060606;
+  --color-foreground: #f0eee8;
+  --color-card: #0f0e13;
+  --color-card-foreground: #f0eee8;
+  --color-primary: #F5C518;
+  --color-primary-foreground: #0a0a0a;
+  --color-secondary: #1a1712;
+  --color-secondary-foreground: #e8dfc4;
+  --color-muted: #131215;
+  --color-muted-foreground: #7c7a8a;
+  --color-accent: #fb923c;
+  --color-accent-foreground: #0a0a0a;
+  --color-border: rgba(245, 197, 24, 0.12);
+  --color-ring: #F5C518;
   --radius-default: 1rem;
 
   --font-display: "DM Serif Display", Georgia, serif;
@@ -31,8 +31,8 @@
 
 :root {
   font-family: var(--font-body);
-  background-color: #0d0d12;
-  color: #f0eef8;
+  background-color: #060606;
+  color: #f0eee8;
 }
 
 ::-webkit-scrollbar {
@@ -40,30 +40,30 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(167, 139, 250, 0.2);
+  background: rgba(245, 197, 24, 0.2);
   border-radius: 4px;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: #0d0d12;
+  background-color: #060606;
 }
 
 .slice-glow {
-  box-shadow: 0 0 60px -10px rgba(167, 139, 250, 0.25), 0 0 120px -30px rgba(232, 121, 249, 0.1);
+  box-shadow: 0 0 60px -10px rgba(245, 197, 24, 0.25), 0 0 120px -30px rgba(251, 146, 60, 0.1);
 }
 
 .slice-glow-sm {
-  box-shadow: 0 0 20px -4px rgba(167, 139, 250, 0.2);
+  box-shadow: 0 0 20px -4px rgba(245, 197, 24, 0.2);
 }
 
 .mesh-bg {
   background:
-    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(167, 139, 250, 0.08) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 80% 80%, rgba(232, 121, 249, 0.06) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 40% at 50% 40%, rgba(99, 102, 241, 0.05) 0%, transparent 60%),
-    #0d0d12;
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(245, 197, 24, 0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 80%, rgba(251, 146, 60, 0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 50% 40%, rgba(180, 130, 20, 0.04) 0%, transparent 60%),
+    #060606;
 }
 
 .card-hover {
@@ -71,7 +71,7 @@ body {
 }
 .card-hover:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 40px -8px rgba(167, 139, 250, 0.2);
+  box-shadow: 0 12px 40px -8px rgba(245, 197, 24, 0.18);
 }
 
 .pill-amount {
