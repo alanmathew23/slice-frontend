@@ -3,6 +3,8 @@ import { useNavigate } from "react-router"
 import { useApp } from "../context"
 import { Input, Button } from "../ui"
 
+const PENDING_INVITE_KEY = "slice_pending_invite_token"
+
 export default function Auth() {
   const { signIn, signUp } = useApp()
   const navigate = useNavigate()
@@ -30,7 +32,10 @@ export default function Auth() {
         : await signUp(email, password, name)
 
     if (result.ok) {
-      navigate("/groups")
+      // If they arrived here via an invite link, resume it instead of
+      // going to the default dashboard.
+      const pendingToken = localStorage.getItem(PENDING_INVITE_KEY)
+      navigate(pendingToken ? `/join/${pendingToken}` : "/groups")
       return
     }
 

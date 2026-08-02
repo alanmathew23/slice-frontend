@@ -7,6 +7,7 @@ import {
   apiGetGroups, apiGetMembers, apiAddMember,
   apiGetExpenses, apiCreateExpense, apiDeleteExpense,
   apiGetSettlements, apiCreateSettlement,
+  apiCreateInvite,
   type ApiGroup, type ApiMember, type ApiExpense, type ApiSettlement,
 } from "../api"
 
@@ -533,18 +534,72 @@ function BalancesTab({
   )
 }
 
+function InviteModal({ groupId, onClose }: { groupId: string; onClose: () => void }) {
+  const [link, setLink] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    apiCreateInvite(groupId)
+      .then((invite) => setLink(`${window.location.origin}/join/${invite.token}`))
+      .catch(() => setError("Couldn't create an invite link. Please try again."))
+      .finally(() => setLoading(false))
+  }, [groupId])
+
+  const copy = async () => {
+    if (!link) return
+    await navigator.clipboard.writeText(link)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <Modal onClose={onClose}>
+      <h2 className="text-lg font-bold mb-4" style={{ fontFamily: "var(--font-display)" }}>Invite to group</h2>
+      <p className="text-xs mb-4" style={{ color: "#7c7a99" }}>
+        Anyone with this link can join — it works for multiple people until it expires.
+      </p>
+      {loading ? (
+        <p className="text-sm" style={{ color: "#7c7a99" }}>Generating link…</p>
+      ) : error ? (
+        <p className="text-xs" style={{ color: "#f87171" }}>{error}</p>
+      ) : (
+        <div className="space-y-3">
+          <div
+            className="rounded-xl px-3 py-2.5 text-xs break-all"
+            style={{ background: "#0d0d12", border: "1px solid rgba(167,139,250,0.2)", color: "#f0eef8" }}
+          >
+            {link}
+          </div>
+          <Button variant="primary" className="w-full" onClick={copy}>
+            {copied ? "Copied!" : "Copy link"}
+          </Button>
+        </div>
+      )}
+      <div className="mt-3">
+        <Button variant="ghost" className="w-full" onClick={onClose}>Done</Button>
+      </div>
+    </Modal>
+  )
+}
+
 // ─── Tab: Members ────────────────────────────────────────────────────────────
 
 function MembersTab({
   groupId, members, currentUserId, onChanged,
 }: { groupId: string; members: ApiMember[]; currentUserId: string; onChanged: () => void }) {
   const [adding, setAdding] = useState(false)
+  const [inviting, setInviting] = useState(false)
 
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
         <SectionLabel>MEMBERS ({members.length})</SectionLabel>
-        <Button size="sm" variant="outline" onClick={() => setAdding(true)}>+ Add</Button>
+        <div className="flex gap-2">
+          <Button size="sm" variant="primary" onClick={() => setInviting(true)}>Invite</Button>
+          <Button size="sm" variant="outline" onClick={() => setAdding(true)}>+ Add by ID</Button>
+        </div>
       </div>
       <div className="space-y-2">
         {members.map((m) => (
@@ -565,6 +620,7 @@ function MembersTab({
           onAdded={() => { setAdding(false); onChanged() }}
         />
       )}
+      {inviting && <InviteModal groupId={groupId} onClose={() => setInviting(false)} />}
     </div>
   )
 }

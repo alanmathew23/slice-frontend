@@ -316,3 +316,26 @@ export async function apiDeleteSettlement(groupId: string, settlementId: string)
   const res = await apiFetch(`/groups/${groupId}/settlements/${settlementId}`, { method: "DELETE" })
   if (!res.ok) throw new Error(`Failed to delete settlement (${res.status})`)
 }
+
+// ─── Invites ────────────────────────────────────────────────────────────────
+
+export type ApiInvite = {
+  token: string
+  groupId: string
+  expiresAt: string
+}
+
+export async function apiCreateInvite(groupId: string): Promise<ApiInvite> {
+  const res = await apiFetch(`/groups/${groupId}/invites`, { method: "POST" })
+  if (!res.ok) throw new Error(`Failed to create invite (${res.status})`)
+  return res.json()
+}
+
+export async function apiAcceptInvite(token: string): Promise<{ groupId: string }> {
+  const res = await apiFetch(`/invites/${token}/accept`, { method: "POST" })
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    throw new Error(body.error || `Failed to accept invite (${res.status})`)
+  }
+  return res.json()
+}
