@@ -179,3 +179,72 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
   }
   return fetch(`${API_BASE}${path}`, { ...options, headers })
 }
+// ─── Groups / Members / Expenses ───────────────────────────────────────────
+
+export type ApiGroup = {
+  groupId: string
+  groupName: string
+  createdAt: string
+  memberIds: string[]
+}
+
+export type ApiMember = {
+  userId: string
+  userName: string
+  joinedAt: string
+}
+
+export type ApiExpenseSplit = {
+  userId: string
+  amountOwedCents: number
+  isPayer: boolean
+}
+
+export type ApiExpense = {
+  expenseId: string
+  description: string
+  amountCents: number
+  paidBy: string
+  splitType: string
+  createdAt: string
+  splits: ApiExpenseSplit[]
+}
+
+export async function apiGetGroups(): Promise<ApiGroup[]> {
+  const res = await apiFetch("/groups")
+  if (!res.ok) throw new Error(`Failed to load groups (${res.status})`)
+  const data = await res.json()
+  return data.groups
+}
+
+export async function apiCreateGroup(groupName: string): Promise<{ groupId: string; groupName: string; createdAt: string }> {
+  const res = await apiFetch("/groups", {
+    method: "POST",
+    body: JSON.stringify({ groupName }),
+  })
+  if (!res.ok) throw new Error(`Failed to create group (${res.status})`)
+  return res.json()
+}
+
+export async function apiAddMember(groupId: string, userId: string): Promise<ApiMember> {
+  const res = await apiFetch(`/groups/${groupId}/members`, {
+    method: "POST",
+    body: JSON.stringify({ userId }),
+  })
+  if (!res.ok) throw new Error(`Failed to add member (${res.status})`)
+  return res.json()
+}
+
+export async function apiGetMembers(groupId: string): Promise<ApiMember[]> {
+  const res = await apiFetch(`/groups/${groupId}/members`)
+  if (!res.ok) throw new Error(`Failed to load members (${res.status})`)
+  const data = await res.json()
+  return data.members
+}
+
+export async function apiGetExpenses(groupId: string): Promise<ApiExpense[]> {
+  const res = await apiFetch(`/groups/${groupId}/expenses`)
+  if (!res.ok) throw new Error(`Failed to load expenses (${res.status})`)
+  const data = await res.json()
+  return data.expenses
+}
