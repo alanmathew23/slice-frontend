@@ -261,11 +261,18 @@ export async function apiCreateExpense(
     splits: { userId: string; amountOwedCents: number; isPayer: boolean }[]
   }
 ): Promise<ApiExpense> {
+  const payload = {
+    ...body,
+    participantIds: body.splits.map((s) => s.userId),
+  }
   const res = await apiFetch(`/groups/${groupId}/expenses`, {
     method: "POST",
-    body: JSON.stringify(body),
+    body: JSON.stringify(payload),
   })
-  if (!res.ok) throw new Error(`Failed to create expense (${res.status})`)
+  if (!res.ok) {
+    const errBody = await res.json().catch(() => ({}))
+    throw new Error(errBody.error || `Failed to create expense (${res.status})`)
+  }
   return res.json()
 }
 
