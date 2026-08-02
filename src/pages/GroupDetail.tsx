@@ -416,7 +416,11 @@ function BalancesTab({
   const netPerPerson = members.map((m) => {
     const paidCents = expenses.filter((e) => e.paidBy === m.userId).reduce((s, e) => s + e.amountCents, 0)
     const shareCents = expenses.flatMap((e) => e.splits.filter((s) => s.userId === m.userId).map((s) => s.amountOwedCents)).reduce((s, x) => s + x, 0)
-    return { member: m, netCents: paidCents - shareCents }
+    // Settling as the payer reduces what you owe (net goes up); settling as
+    // the receiver means you've already been paid (net goes down).
+    const settledOutCents = settlements.filter((s) => s.fromUserId === m.userId).reduce((s, x) => s + x.amountCents, 0)
+    const settledInCents = settlements.filter((s) => s.toUserId === m.userId).reduce((s, x) => s + x.amountCents, 0)
+    return { member: m, netCents: paidCents - shareCents + settledOutCents - settledInCents }
   })
 
   const handleSettle = async (fromId: string, toId: string, amountCents: number) => {
