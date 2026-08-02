@@ -226,10 +226,10 @@ export async function apiCreateGroup(groupName: string): Promise<{ groupId: stri
   return res.json()
 }
 
-export async function apiAddMember(groupId: string, userId: string): Promise<ApiMember> {
+export async function apiAddMember(groupId: string, userId: string, userName: string): Promise<ApiMember> {
   const res = await apiFetch(`/groups/${groupId}/members`, {
     method: "POST",
-    body: JSON.stringify({ userId }),
+    body: JSON.stringify({ userId, userName }),
   })
   if (!res.ok) throw new Error(`Failed to add member (${res.status})`)
   return res.json()

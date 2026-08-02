@@ -30,7 +30,7 @@ function CreateGroupModal({ onClose, onCreated }: { onClose: () => void; onCreat
     try {
       const g = await apiCreateGroup(name.trim())
       // Bootstrap: creator isn't auto-added as a member, so add them now.
-      await apiAddMember(g.groupId, currentUser!.id)
+      await apiAddMember(g.groupId, currentUser!.id, currentUser!.name)
       onCreated(g.groupId)
     } catch {
       setError("Couldn't create the group. Please try again.")

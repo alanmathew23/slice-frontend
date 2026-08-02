@@ -66,13 +66,15 @@ function AddMemberModal({
   groupId, existingIds, onClose, onAdded,
 }: { groupId: string; existingIds: string[]; onClose: () => void; onAdded: () => void }) {
   const [userId, setUserId] = useState("")
+  const [userName, setUserName] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     const id = userId.trim()
-    if (!id || submitting) return
+    const name = userName.trim()
+    if (!id || !name || submitting) return
     if (existingIds.includes(id)) {
       setError("That user is already in the group.")
       return
@@ -80,8 +82,9 @@ function AddMemberModal({
     setSubmitting(true)
     setError(null)
     try {
-      await apiAddMember(groupId, id)
+      await apiAddMember(groupId, id, name)
       setUserId("")
+      setUserName("")
       onAdded()
     } catch {
       setError("Couldn't add that user — check the ID and that they have a Slice account.")
@@ -94,7 +97,7 @@ function AddMemberModal({
     <Modal onClose={onClose}>
       <h2 className="text-lg font-bold mb-4" style={{ fontFamily: "var(--font-display)" }}>Add member</h2>
       <p className="text-xs mb-4" style={{ color: "#7c7a99" }}>
-        Email search isn't available yet — ask the person for their account ID for now.
+        Email search isn't available yet — ask the person for their account ID and name for now.
       </p>
       <form onSubmit={submit} className="space-y-3">
         <Input
@@ -103,10 +106,15 @@ function AddMemberModal({
           onChange={(e) => setUserId(e.target.value)}
           autoFocus
         />
+        <Input
+          placeholder="Their name…"
+          value={userName}
+          onChange={(e) => setUserName(e.target.value)}
+        />
         {error && <p className="text-xs" style={{ color: "#f87171" }}>{error}</p>}
         <div className="flex gap-2">
           <Button type="button" variant="ghost" onClick={onClose} className="flex-1">Done</Button>
-          <Button type="submit" variant="primary" className="flex-1" disabled={!userId.trim() || submitting}>
+          <Button type="submit" variant="primary" className="flex-1" disabled={!userId.trim() || !userName.trim() || submitting}>
             {submitting ? "Adding…" : "Add"}
           </Button>
         </div>
