@@ -1,0 +1,10 @@
+{
+  "description": "Easily track and manage shared expenses with friends during outings, ensuring transparency and simplifying group payments in a stylish, modern interface.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

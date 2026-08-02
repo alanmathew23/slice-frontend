@@ -1,0 +1,181 @@
+// Real backend + Cognito wiring — replaces the mock in context.tsx
+
+import type { User } from "./store"
+
+const API_BASE = "https://i003q2t4r8.execute-api.ap-south-1.amazonaws.com/dev"
+const COGNITO_REGION = "ap-south-1"
+const COGNITO_CLIENT_ID = "23pf0k85v7006rvsh5r1j5pedq"
+const COGNITO_ENDPOINT = `https://cognito-idp.${COGNITO_REGION}.amazonaws.com/`
+
+const STORAGE_KEYS = {
+  idToken: "slice_id_token",
+  accessToken: "slice_access_token",
+  refreshToken: "slice_refresh_token",
+} as const
+
+// ─── Token storage ────────────────────────────────────────────────────────
+
+export function storeTokens(tokens: { idToken: string; accessToken: string; refreshToken: string }) {
+  localStorage.setItem(STORAGE_KEYS.idToken, tokens.idToken)
+  localStorage.setItem(STORAGE_KEYS.accessToken, tokens.accessToken)
+  localStorage.setItem(STORAGE_KEYS.refreshToken, tokens.refreshToken)
+}
+
+export function clearTokens() {
+  localStorage.removeItem(STORAGE_KEYS.idToken)
+  localStorage.removeItem(STORAGE_KEYS.accessToken)
+  localStorage.removeItem(STORAGE_KEYS.refreshToken)
+}
+
+export function getIdToken(): string | null {
+  return localStorage.getItem(STORAGE_KEYS.idToken)
+}
+
+export function getAccessToken(): string | null {
+  return localStorage.getItem(STORAGE_KEYS.accessToken)
+}
+
+export function getRefreshToken(): string | null {
+  return localStorage.getItem(STORAGE_KEYS.refreshToken)
+}
+
+// ─── JWT decode (no verification needed client-side — the backend verifies
+// every token on every request; this is just to read display claims) ──────
+
+type IdTokenClaims = {
+  sub: string
+  email: string
+  name?: string
+  exp: number
+}
+
+function decodeIdToken(idToken: string): IdTokenClaims | null {
+  try {
+    const payload = idToken.split(".")[1]
+    // JWTs use base64url, not plain base64 — swap chars before atob
+    const base64 = payload.replace(/-/g, "+").replace(/_/g, "/")
+    const json = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map((c) => "%" + c.charCodeAt(0).toString(16).padStart(2, "0"))
+        .join("")
+    )
+    return JSON.parse(json)
+  } catch {
+    return null
+  }
+}
+
+/** Reads whatever ID token is in localStorage and returns a User if it's
+ *  present and not expired, or null otherwise (no session, or expired). */
+export function getStoredUser(): User | null {
+  const idToken = getIdToken()
+  if (!idToken) return null
+
+  const claims = decodeIdToken(idToken)
+  if (!claims) return null
+
+  const nowSeconds = Math.floor(Date.now() / 1000)
+  if (claims.exp < nowSeconds) {
+    // Expired — caller should clear tokens and treat as signed out.
+    // (A refresh-token flow could go here later; not built yet.)
+    return null
+  }
+
+  const name = claims.name || claims.email
+  return {
+    id: claims.sub,
+    email: claims.email,
+    name,
+    avatar: name[0]?.toUpperCase() || "?",
+  }
+}
+
+// ─── Sign up (calls our own backend, which auto-confirms server-side) ─────
+
+export async function apiSignUp(
+  email: string,
+  password: string,
+  name: string
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  try {
+    const res = await fetch(`${API_BASE}/signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password, name }),
+    })
+    const data = await res.json().catch(() => ({}))
+
+    if (res.status === 201) return { ok: true }
+    if (res.status === 409) return { ok: false, error: "An account with that email already exists." }
+    return { ok: false, error: data.message || "Sign up failed. Please try again." }
+  } catch {
+    return { ok: false, error: "Network error — check your connection and try again." }
+  }
+}
+
+// ─── Sign in (calls Cognito's InitiateAuth directly — public client,
+// no secret, so this is a normal browser-safe call) ────────────────────────
+
+export async function apiSignIn(
+  email: string,
+  password: string
+): Promise<
+  | { ok: true; tokens: { idToken: string; accessToken: string; refreshToken: string } }
+  | { ok: false; error: string }
+> {
+  try {
+    const res = await fetch(COGNITO_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-amz-json-1.1",
+        "X-Amz-Target": "AWSCognitoIdentityProviderService.InitiateAuth",
+      },
+      body: JSON.stringify({
+        AuthFlow: "USER_PASSWORD_AUTH",
+        ClientId: COGNITO_CLIENT_ID,
+        AuthParameters: { USERNAME: email, PASSWORD: password },
+      }),
+    })
+
+    const data = await res.json().catch(() => ({}))
+
+    if (!res.ok) {
+      if (data.__type === "NotAuthorizedException") {
+        return { ok: false, error: "Incorrect email or password." }
+      }
+      if (data.__type === "UserNotFoundException") {
+        return { ok: false, error: "No account found with that email." }
+      }
+      return { ok: false, error: data.message || "Sign in failed. Please try again." }
+    }
+
+    const result = data.AuthenticationResult
+    if (!result?.IdToken) {
+      return { ok: false, error: "Unexpected response from sign in. Please try again." }
+    }
+
+    return {
+      ok: true,
+      tokens: {
+        idToken: result.IdToken,
+        accessToken: result.AccessToken,
+        refreshToken: result.RefreshToken,
+      },
+    }
+  } catch {
+    return { ok: false, error: "Network error — check your connection and try again." }
+  }
+}
+
+// ─── Authenticated fetch helper (for wiring the rest of the app later) ────
+
+export async function apiFetch(path: string, options: RequestInit = {}) {
+  const idToken = getIdToken()
+  const headers = {
+    "Content-Type": "application/json",
+    ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
+    ...(options.headers || {}),
+  }
+  return fetch(`${API_BASE}${path}`, { ...options, headers })
+}
