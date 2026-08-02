@@ -142,7 +142,7 @@ function ExpenseModal({
   const selected = members.filter((m) => splitMembers.includes(m.userId))
   const totalCents = Math.round((parseFloat(amount) || 0) * 100)
 
-  const computedSplitsCents = (): { userId: string; amountOwedCents: number }[] => {
+  const computedSplitsCents = (): { userId: string; amountOwedCents: number; percentage?: number }[] => {
     if (selected.length === 0) return []
     if (splitType === "equal") {
       const base = Math.floor(totalCents / selected.length)
@@ -152,11 +152,12 @@ function ExpenseModal({
     if (splitType === "exact") {
       return selected.map((m) => ({ userId: m.userId, amountOwedCents: Math.round((parseFloat(splitValues[m.userId] || "0")) * 100) }))
     }
-    // percentage
-    return selected.map((m) => ({
-      userId: m.userId,
-      amountOwedCents: Math.round((parseFloat(splitValues[m.userId] || "0") / 100) * totalCents),
-    }))
+    // percentage — send both the raw percentage (backend validates against
+    // this) and the computed cents (for local display/consistency)
+    return selected.map((m) => {
+      const pct = parseFloat(splitValues[m.userId] || "0")
+      return { userId: m.userId, amountOwedCents: Math.round((pct / 100) * totalCents), percentage: pct }
+    })
   }
 
   const totalCheck = () => {
