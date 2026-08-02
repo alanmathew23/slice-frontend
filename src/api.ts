@@ -258,7 +258,7 @@ export async function apiCreateExpense(
     amountCents: number
     paidBy: string
     splitType: string
-    splits: { userId: string; amountOwedCents: number; isPayer: boolean; percentage?: number }[]
+    splits: { userId: string; amountOwedCents: number; isPayer: boolean; percentage?: number; amountCents?: number }[]
   }
 ): Promise<ApiExpense> {
   const payload = {

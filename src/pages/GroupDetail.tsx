@@ -150,7 +150,10 @@ function ExpenseModal({
       return selected.map((m, i) => ({ userId: m.userId, amountOwedCents: base + (i < remainder ? 1 : 0) }))
     }
     if (splitType === "exact") {
-      return selected.map((m) => ({ userId: m.userId, amountOwedCents: Math.round((parseFloat(splitValues[m.userId] || "0")) * 100) }))
+      return selected.map((m) => {
+        const cents = Math.round((parseFloat(splitValues[m.userId] || "0")) * 100)
+        return { userId: m.userId, amountOwedCents: cents, amountCents: cents }
+      })
     }
     // percentage — send both the raw percentage (backend validates against
     // this) and the computed cents (for local display/consistency)
