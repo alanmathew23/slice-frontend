@@ -48,7 +48,7 @@ export default function Auth() {
       className="min-h-screen flex items-center justify-center px-4"
       style={{
         background:
-          "radial-gradient(ellipse 80% 60% at 20% 10%, rgba(167,139,250,0.08) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 80% 80%, rgba(232,121,249,0.06) 0%, transparent 60%), #0d0d12",
+          "radial-gradient(ellipse 80% 60% at 20% 10%, rgba(245,197,24,0.07) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 80% 80%, rgba(251,146,60,0.05) 0%, transparent 60%), #060606",
       }}
     >
       <div className="w-full max-w-sm">
@@ -58,12 +58,12 @@ export default function Auth() {
             <span className="text-2xl float">✦</span>
             <h1
               className="text-4xl font-bold tracking-tight"
-              style={{ fontFamily: "var(--font-display)", color: "#f0eef8" }}
+              style={{ fontFamily: "var(--font-display)", color: "#f0eee8" }}
             >
               slice
             </h1>
           </div>
-          <p className="text-sm" style={{ color: "#7c7a99" }}>
+          <p className="text-sm" style={{ color: "#7c7a8a" }}>
             Split expenses. Stay friends.
           </p>
         </div>
@@ -71,12 +71,12 @@ export default function Auth() {
         {/* Card */}
         <div
           className="rounded-3xl p-6 border"
-          style={{ background: "#15141f", borderColor: "rgba(167,139,250,0.15)" }}
+          style={{ background: "#0f0e13", borderColor: "rgba(245,197,24,0.15)" }}
         >
           {/* Mode toggle */}
           <div
             className="flex rounded-xl p-1 mb-6"
-            style={{ background: "#0d0d12" }}
+            style={{ background: "#060606" }}
           >
             {(["signin", "signup"] as const).map((m) => (
               <button
@@ -85,8 +85,8 @@ export default function Auth() {
                 className="flex-1 text-sm font-semibold py-2 rounded-lg transition-all"
                 style={
                   mode === m
-                    ? { background: "#a78bfa", color: "#0d0d12" }
-                    : { color: "#7c7a99" }
+                    ? { background: "#F5C518", color: "#060606" }
+                    : { color: "#7c7a8a" }
                 }
               >
                 {m === "signin" ? "Sign in" : "Sign up"}
@@ -122,7 +122,7 @@ export default function Auth() {
               required
             />
             {mode === "signup" && (
-              <p className="text-xs" style={{ color: "#7c7a99" }}>
+              <p className="text-xs" style={{ color: "#7c7a8a" }}>
                 At least 8 characters, with uppercase, lowercase, a number, and a symbol.
               </p>
             )}

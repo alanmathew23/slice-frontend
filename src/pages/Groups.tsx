@@ -50,7 +50,7 @@ function CreateGroupModal({ onClose, onCreated }: { onClose: () => void; onCreat
           autoFocus
         />
         <div>
-          <p className="text-xs font-medium mb-2" style={{ color: "#7c7a99" }}>Emoji</p>
+          <p className="text-xs font-medium mb-2" style={{ color: "#7c7a8a" }}>Emoji</p>
           <div className="flex flex-wrap gap-2">
             {GROUP_EMOJIS.map((em) => (
               <button
@@ -59,8 +59,8 @@ function CreateGroupModal({ onClose, onCreated }: { onClose: () => void; onCreat
                 onClick={() => setEmoji(em)}
                 className="w-10 h-10 rounded-xl text-xl transition-all hover:scale-110"
                 style={{
-                  background: emoji === em ? "rgba(167,139,250,0.2)" : "rgba(255,255,255,0.04)",
-                  border: `1px solid ${emoji === em ? "rgba(167,139,250,0.4)" : "transparent"}`,
+                  background: emoji === em ? "rgba(245,197,24,0.2)" : "rgba(255,255,255,0.04)",
+                  border: `1px solid ${emoji === em ? "rgba(245,197,24,0.4)" : "transparent"}`,
                 }}
               >
                 {em}
@@ -134,7 +134,7 @@ export default function Groups() {
           <div className="flex items-center gap-2">
             <div className="text-right mr-1">
               <p className="text-sm font-medium">{currentUser!.name}</p>
-              <p className="text-xs" style={{ color: "#7c7a99" }}>{currentUser!.email}</p>
+              <p className="text-xs" style={{ color: "#7c7a8a" }}>{currentUser!.email}</p>
             </div>
             <Avatar label={currentUser!.name} id={currentUser!.id} size="sm" />
             <Button variant="ghost" size="sm" onClick={() => { signOut(); navigate("/") }}>Sign out</Button>
@@ -147,7 +147,7 @@ export default function Groups() {
         </div>
 
         {loading ? (
-          <p className="text-sm" style={{ color: "#7c7a99" }}>Loading groups…</p>
+          <p className="text-sm" style={{ color: "#7c7a8a" }}>Loading groups…</p>
         ) : error ? (
           <div className="space-y-3">
             <p className="text-sm" style={{ color: "#f87171" }}>{error}</p>
@@ -167,7 +167,7 @@ export default function Groups() {
                   <div className="flex items-center gap-4">
                     <div
                       className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0"
-                      style={{ background: "rgba(167,139,250,0.1)" }}
+                      style={{ background: "rgba(245,197,24,0.1)" }}
                     >
                       🎉
                     </div>
@@ -180,21 +180,21 @@ export default function Groups() {
                           {g.members.slice(0, 4).map((m) => (
                             <div
                               key={m.userId}
-                              className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold ring-1 ring-[#15141f]"
-                              style={{ background: "#a78bfa20", color: "#a78bfa" }}
+                              className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold ring-1 ring-[#0f0e13]"
+                              style={{ background: "#F5C51820", color: "#F5C518" }}
                             >
                               {m.userName?.[0]?.toUpperCase() || "?"}
                             </div>
                           ))}
                         </div>
-                        <span className="text-xs" style={{ color: "#7c7a99" }}>
+                        <span className="text-xs" style={{ color: "#7c7a8a" }}>
                           {g.members.length} member{g.members.length !== 1 ? "s" : ""}
                         </span>
                       </div>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="pill-amount text-lg font-bold">${(g.totalCents / 100).toFixed(0)}</p>
-                      <p className="text-xs" style={{ color: "#7c7a99" }}>{g.expenseCount} expenses</p>
+                      <p className="pill-amount text-lg font-bold">₹{(g.totalCents / 100).toFixed(0)}</p>
+                      <p className="text-xs" style={{ color: "#7c7a8a" }}>{g.expenseCount} expenses</p>
                     </div>
                   </div>
                 </Card>
