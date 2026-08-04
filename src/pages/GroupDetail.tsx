@@ -534,7 +534,6 @@ function MembersTab({
         <SectionLabel>MEMBERS ({members.length})</SectionLabel>
         <div className="flex gap-2">
           <Button size="sm" variant="primary" onClick={() => setInviting(true)}>Invite</Button>
-          <Button size="sm" variant="outline" onClick={() => setAdding(true)}>+ Add by ID</Button>
         </div>
       </div>
       <div className="space-y-2">
