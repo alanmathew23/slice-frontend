@@ -547,14 +547,6 @@ function MembersTab({
           </Card>
         ))}
       </div>
-      {adding && (
-        <AddMemberModal
-          groupId={groupId}
-          existingIds={members.map((m) => m.userId)}
-          onClose={() => setAdding(false)}
-          onAdded={() => { setAdding(false); onChanged() }}
-        />
-      )}
       {inviting && <InviteModal groupId={groupId} onClose={() => setInviting(false)} />}
     </div>
   )
